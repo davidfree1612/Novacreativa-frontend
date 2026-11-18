@@ -413,10 +413,7 @@ export default function App() {
             </span>
 
             <h1 className="text-5xl md:text-7xl font-black tracking-tight max-w-4xl leading-tight mb-8 text-slate-50">
-              Diseñamos el{" "}
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                futuro.
-              </span>
+              Diseñamos el futuro.
             </h1>
 
             <p className="text-lg md:text-xl text-slate-400 max-w-2xl mb-10 leading-relaxed">
