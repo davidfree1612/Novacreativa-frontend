@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AuthModal from './components/AuthModal';
 import AdminPanel from './components/AdminPanel';
-import { createIdea, getMyIdeas, deleteIdea, sendUserMessage } from './services/api';
+import {
+  createIdea,
+  getMyIdeas,
+  deleteIdea,
+  sendUserMessage,
+  wakeUpServer,
+  markMessagesRead
+} from './services/api';
 import {
   Palette,
   Globe,
@@ -24,7 +31,8 @@ import {
   MessageSquare,
   Lightbulb,
   PenTool,
-  Code2
+  Code2,
+  Search
 } from 'lucide-react';
 
 export default function App() {
@@ -37,8 +45,8 @@ export default function App() {
   const [userIdeas, setUserIdeas] = useState([]);
   const [loadingIdeas, setLoadingIdeas] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [historySearch, setHistorySearch] = useState('');
 
-  // Estados para el chat de cada idea en el modal del usuario
   const [replyTexts, setReplyTexts] = useState({});
   const [sendingReplyId, setSendingReplyId] = useState(null);
 
@@ -54,7 +62,10 @@ export default function App() {
   const historyModalRef = useRef(null);
   const tituloRef = useRef(null);
 
+  // Despertar Render al cargar la página + restaurar sesión
   useEffect(() => {
+    wakeUpServer();
+
     const storedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
 
@@ -98,7 +109,28 @@ export default function App() {
     setIsAdminOpen(false);
   };
 
-  // Enviar respuesta del usuario hacia el Admin
+  const handleMarkAsRead = async (ideaId) => {
+    const targetIdea = userIdeas.find(i => i.id === ideaId);
+    const hasUnread = (targetIdea?.messages || []).some(
+      m => m.senderId !== user?.id && m.isRead === false
+    );
+    if (!hasUnread) return;
+
+    await markMessagesRead(ideaId);
+    setUserIdeas(prev =>
+      prev.map(idea =>
+        idea.id === ideaId
+          ? {
+            ...idea,
+            messages: (idea.messages || []).map(m =>
+              m.senderId !== user?.id ? { ...m, isRead: true } : m
+            )
+          }
+          : idea
+      )
+    );
+  };
+
   const handleSendReply = async (e, ideaId) => {
     e.preventDefault();
     const content = replyTexts[ideaId]?.trim();
@@ -107,11 +139,20 @@ export default function App() {
     setSendingReplyId(ideaId);
     try {
       const savedMsg = await sendUserMessage(ideaId, content);
+      await markMessagesRead(ideaId);
 
       setUserIdeas(prevIdeas =>
         prevIdeas.map(idea =>
           idea.id === ideaId
-            ? { ...idea, messages: [...(idea.messages || []), savedMsg] }
+            ? {
+              ...idea,
+              messages: [
+                ...(idea.messages || []).map(m =>
+                  m.senderId !== user?.id ? { ...m, isRead: true } : m
+                ),
+                savedMsg
+              ]
+            }
             : idea
         )
       );
@@ -231,20 +272,51 @@ export default function App() {
     }
   };
 
-  const ideasEnRevision = userIdeas.filter(item => !item.estado || item.estado === 'en_revision' || item.estado === 'En revisión' || item.estado === 'revision');
-  const ideasAceptadas = userIdeas.filter(item => item.estado === 'aceptada');
-  const ideasRechazadas = userIdeas.filter(item => item.estado === 'rechazada');
+  // Total de mensajes sin leer del administrador para el cliente
+  const unreadAdminMessages = userIdeas.reduce((acc, idea) => {
+    const count = (idea.messages || []).filter(
+      m => m.senderId !== user?.id && m.isRead === false
+    ).length;
+    return acc + count;
+  }, 0);
 
-  // Renderizador reutilizable de tarjeta con historial de chat y caja de respuesta
+  // Filtrado por buscador en historial
+  const searchedUserIdeas = userIdeas.filter(item => {
+    const q = historySearch.toLowerCase().trim();
+    if (!q) return true;
+    return (
+      item.titulo?.toLowerCase().includes(q) ||
+      item.servicio?.toLowerCase().includes(q)
+    );
+  });
+
+  const ideasEnRevision = searchedUserIdeas.filter(item => !item.estado || item.estado === 'en_revision' || item.estado === 'En revisión' || item.estado === 'revision');
+  const ideasAceptadas = searchedUserIdeas.filter(item => item.estado === 'aceptada');
+  const ideasRechazadas = searchedUserIdeas.filter(item => item.estado === 'rechazada');
+
   const renderIdeaCard = (item, borderColor, badgeElement) => {
     const messages = item.messages || [];
     const fallbackAdminMsg = item.mensajeAdmin || item.respuestaAdmin || item.comentarioAdmin;
+    const unreadCount = messages.filter(
+      m => m.senderId !== user?.id && m.isRead === false
+    ).length;
 
     return (
-      <article key={item.id} className={`p-4 rounded-xl bg-[#090D16] border ${borderColor} flex flex-col gap-3`}>
+      <article
+        key={item.id}
+        onClick={() => handleMarkAsRead(item.id)}
+        className={`p-4 rounded-xl bg-[#090D16] border ${borderColor} flex flex-col gap-3`}
+      >
         <div className="flex items-center justify-between">
           <nav>
-            <h5 className="font-bold text-slate-50 text-sm">{item.titulo}</h5>
+            <div className="flex items-center gap-2">
+              <h5 className="font-bold text-slate-50 text-sm">{item.titulo}</h5>
+              {unreadCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-cyan-500 text-slate-950">
+                  {unreadCount} nuevo{unreadCount > 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
             <p className="text-xs text-slate-400">
               {item.servicio} • <span className="text-cyan-400 font-medium">{item.presupuesto}</span>
             </p>
@@ -252,7 +324,7 @@ export default function App() {
           <div className="flex items-center gap-2">
             {badgeElement}
             <button
-              onClick={() => handleDeleteIdea(item.id)}
+              onClick={(e) => { e.stopPropagation(); handleDeleteIdea(item.id); }}
               className="text-slate-500 hover:text-red-400 p-1 transition cursor-pointer"
               title="Eliminar"
             >
@@ -261,14 +333,12 @@ export default function App() {
           </div>
         </div>
 
-        {/* SECCIÓN DE CHAT BIDIRECCIONAL */}
         <div className="mt-1 pt-3 border-t border-slate-800 flex flex-col gap-2">
           <span className="text-[11px] font-semibold text-slate-400 flex items-center gap-1.5">
             <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
             Chat directo con NovaCreativa
           </span>
 
-          {/* Lista de mensajes */}
           <div className="space-y-2 max-h-36 overflow-y-auto pr-1 flex flex-col">
             {messages.length === 0 && fallbackAdminMsg && (
               <div className="p-2.5 rounded-lg bg-cyan-950/40 border border-cyan-500/30 text-xs self-start max-w-[85%]">
@@ -302,12 +372,12 @@ export default function App() {
             )}
           </div>
 
-          {/* Input para responder al Admin */}
           <form onSubmit={(e) => handleSendReply(e, item.id)} className="flex gap-2 mt-1">
             <input
               type="text"
               placeholder="Escribe un mensaje al administrador..."
               value={replyTexts[item.id] || ''}
+              onFocus={() => handleMarkAsRead(item.id)}
               onChange={(e) => setReplyTexts(prev => ({ ...prev, [item.id]: e.target.value }))}
               className="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"
             />
@@ -326,7 +396,6 @@ export default function App() {
 
   return (
     <>
-      {/* NAVEGACIÓN PRINCIPAL CON LOGO OFICIAL */}
       <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#090D16]/90 border-b border-slate-800/80">
         <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <a href="#" className="flex items-center gap-3 group">
@@ -381,7 +450,6 @@ export default function App() {
           </nav>
         </nav>
 
-        {/* Menú desplegable móvil */}
         {isMenuOpen && (
           <div className="md:hidden bg-[#111827] border-b border-slate-800 px-6 py-4 space-y-3">
             <a href="#servicios" onClick={() => setIsMenuOpen(false)} className="block text-sm text-slate-300 hover:text-cyan-400">Servicios</a>
@@ -397,13 +465,9 @@ export default function App() {
         )}
       </header>
 
-      {/* CONTENIDO PRINCIPAL */}
       <main className="min-h-screen bg-[#090D16] text-slate-50 selection:bg-cyan-500 selection:text-slate-950">
-        {/* HERO CON FONDO ATMOSFÉRICO */}
         <section className="relative overflow-hidden border-b border-slate-800/60">
-          {/* Cuadrícula tecnológica tenue */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-25 pointer-events-none" />
-          {/* Resplandor central Cian */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-cyan-500/15 blur-[120px] rounded-full pointer-events-none" />
 
           <div className="relative max-w-7xl mx-auto px-6 pt-28 pb-24 flex flex-col items-center text-center">
@@ -423,9 +487,14 @@ export default function App() {
             <nav className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={openHistoryPanel}
-                className="flex items-center justify-center gap-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-[0_0_30px_rgba(6,182,212,0.35)] hover:scale-105 active:scale-95 border border-cyan-400/30 cursor-pointer"
+                className="relative flex items-center justify-center gap-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-[0_0_30px_rgba(6,182,212,0.35)] hover:scale-105 active:scale-95 border border-cyan-400/30 cursor-pointer"
               >
                 {userIdeas.length === 1 ? 'Mi idea' : 'Mis ideas'}
+                {unreadAdminMessages > 0 && (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-black bg-slate-950 text-cyan-400 border border-cyan-400/50 animate-pulse">
+                    {unreadAdminMessages}
+                  </span>
+                )}
                 <ArrowRight className="w-5 h-5" />
               </button>
             </nav>
@@ -452,7 +521,7 @@ export default function App() {
           </section>
         </section>
 
-        {/* PROCESO DE TRABAJO (SOLO LOS 4 PASOS) */}
+        {/* PROCESO DE TRABAJO */}
         <section id="proceso" className="py-24 max-w-7xl mx-auto px-6 border-b border-slate-800/80">
           <header className="text-center mb-16">
             <span className="inline-block px-4 py-1.5 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-xs font-semibold uppercase tracking-widest mb-4">
@@ -561,14 +630,13 @@ export default function App() {
         </section>
       </main>
 
-      {/* FOOTER */}
       <footer className="bg-[#090D16] border-t border-slate-800/80 py-12">
         <section className="max-w-7xl mx-auto px-6 text-center text-sm text-slate-400">
           <p>© 2026 NovaCreativa. Todos los derechos reservados.</p>
         </section>
       </footer>
 
-      {/* 1. MODAL DE HISTORIAL CON CHAT BIDIRECCIONAL */}
+      {/* MODAL DE HISTORIAL CON BUSCADOR Y NOTIFICACIONES */}
       <dialog
         ref={historyModalRef}
         className="backdrop:bg-black/80 bg-[#111827] text-slate-50 p-6 sm:p-8 rounded-3xl border border-slate-800 max-w-2xl w-full shadow-[0_0_50px_rgba(6,182,212,0.15)] backdrop-blur-2xl"
@@ -584,7 +652,7 @@ export default function App() {
         </header>
 
         {user && (
-          <aside className="mb-6 p-4 rounded-2xl bg-[#090D16] border border-slate-800 flex items-center justify-between">
+          <aside className="mb-4 p-4 rounded-2xl bg-[#090D16] border border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/30 text-cyan-400">
                 <Building2 className="w-5 h-5" />
@@ -610,7 +678,20 @@ export default function App() {
           </aside>
         )}
 
-        {/* SECCIÓN 1: IDEAS EN REVISIÓN */}
+        {/* Buscador rápido de ideas */}
+        {userIdeas.length > 0 && (
+          <div className="relative mb-5">
+            <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Filtrar mis ideas por nombre o servicio..."
+              value={historySearch}
+              onChange={(e) => setHistorySearch(e.target.value)}
+              className="w-full bg-[#090D16] border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-50 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"
+            />
+          </div>
+        )}
+
         <section className="mb-6">
           <h4 className="text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
             <Clock className="w-4 h-4 text-amber-400" /> Ideas en Revisión
@@ -634,7 +715,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* SECCIÓN 2: IDEAS ACEPTADAS */}
         <section className="mb-6">
           <h4 className="text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Ideas Aceptadas
@@ -656,7 +736,6 @@ export default function App() {
           </div>
         </section>
 
-        {/* SECCIÓN 3: IDEAS RECHAZADAS */}
         <section className="mb-2">
           <h4 className="text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
             <XCircle className="w-4 h-4 text-red-400" /> Ideas Rechazadas
@@ -679,14 +758,12 @@ export default function App() {
         </section>
       </dialog>
 
-      {/* 2. MODAL DE CREACIÓN AMPLIADO */}
+      {/* MODAL DE CREACIÓN */}
       <dialog
         ref={createModalRef}
         className="backdrop:bg-black/80 bg-transparent p-0 m-auto max-w-md w-full overflow-visible"
       >
         <div className="relative bg-[#0B1221] text-slate-50 p-6 sm:p-7 rounded-2xl border border-cyan-500/60 shadow-[0_0_45px_rgba(6,182,212,0.35)]">
-
-          {/* Decoración de matriz de puntos cian */}
           <div className="hidden sm:grid grid-cols-3 gap-1.5 absolute -top-6 right-8 pointer-events-none opacity-60">
             {[...Array(6)].map((_, i) => (
               <span key={i} className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
@@ -698,7 +775,6 @@ export default function App() {
             ))}
           </div>
 
-          {/* Cabecera del Modal */}
           <header className="flex justify-between items-center mb-5 pb-3 border-b border-slate-800/80">
             <h3 className="text-lg sm:text-xl font-bold flex items-center gap-2.5 text-slate-50">
               <span className="p-1.5 rounded-lg bg-cyan-950/80 border border-cyan-500/40 text-cyan-400">
@@ -715,7 +791,6 @@ export default function App() {
             </button>
           </header>
 
-          {/* Formulario apilado de 5 campos */}
           <form onSubmit={handleSaveIdea} className="space-y-3.5">
             <label className="block">
               <span className="text-xs font-medium text-slate-300 mb-1.5 block">

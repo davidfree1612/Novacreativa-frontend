@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
 
 const getHeaders = () => {
   const token = localStorage.getItem('token');
@@ -6,6 +6,16 @@ const getHeaders = () => {
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` })
   };
+};
+
+// Despertar preventivo del servidor en Render (Cold Start)
+export const wakeUpServer = async () => {
+  try {
+    const rootUrl = API_URL.replace(/\/api$/, '');
+    await fetch(rootUrl, { method: 'GET' });
+  } catch {
+    // Silencioso si está despertando
+  }
 };
 
 export const registerCompany = async (userData) => {
@@ -70,4 +80,15 @@ export const sendUserMessage = async (ideaId, content) => {
   const data = await res.json();
   if (!res.ok) throw new Error(data.message || 'Error al enviar el mensaje');
   return data;
+};
+
+export const markMessagesRead = async (ideaId) => {
+  try {
+    await fetch(`${API_URL}/ideas/${ideaId}/read`, {
+      method: 'PATCH',
+      headers: getHeaders()
+    });
+  } catch {
+    // Silencioso
+  }
 };

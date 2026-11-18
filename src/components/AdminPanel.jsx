@@ -1,5 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { X, CheckCircle2, XCircle, MessageSquare, Send, ShieldAlert, Building2, Clock, FileText } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+    X,
+    CheckCircle2,
+    XCircle,
+    MessageSquare,
+    Send,
+    ShieldAlert,
+    Building2,
+    Clock,
+    FileText,
+    Search
+} from 'lucide-react';
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
 
@@ -9,13 +20,17 @@ export default function AdminPanel({ isOpen, onClose }) {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
 
+    // Buscador y filtro de estado
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('todas');
+
     useEffect(() => {
         if (isOpen) {
             fetchAdminIdeas();
         }
     }, [isOpen]);
 
-    // Refresco automático del chat cada 5 segundos cuando hay una idea abierta
+    // Refresco automático cada 5 segundos
     useEffect(() => {
         if (!isOpen || !selectedIdea?.id) return;
 
@@ -26,7 +41,6 @@ export default function AdminPanel({ isOpen, onClose }) {
         return () => clearInterval(interval);
     }, [isOpen, selectedIdea?.id]);
 
-    // Cargar todas las ideas de los usuarios
     const fetchAdminIdeas = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -45,7 +59,6 @@ export default function AdminPanel({ isOpen, onClose }) {
         }
     };
 
-    // Cargar mensajes de una idea específica
     const fetchMessages = async (ideaId) => {
         try {
             const token = localStorage.getItem('token');
@@ -55,12 +68,25 @@ export default function AdminPanel({ isOpen, onClose }) {
             if (!res.ok) return;
             const data = await res.json();
             setMessages(data);
+
+            // Actualizar estado local de leídos en la lista lateral
+            setIdeas(prev =>
+                prev.map(idea =>
+                    idea.id === ideaId
+                        ? {
+                            ...idea,
+                            messages: (idea.messages || []).map(m =>
+                                m.senderId !== 'admin-master-id' ? { ...m, isRead: true } : m
+                            )
+                        }
+                        : idea
+                )
+            );
         } catch (error) {
             console.error("Error al cargar mensajes:", error);
         }
     };
 
-    // Enviar mensaje en el chat
     const handleSendMessage = async (e) => {
         e.preventDefault();
         if (!newMessage.trim() || !selectedIdea) return;
@@ -84,7 +110,6 @@ export default function AdminPanel({ isOpen, onClose }) {
         }
     };
 
-    // Cambiar estado (Aceptar o Rechazar)
     const handleUpdateStatus = async (id, estado) => {
         try {
             const token = localStorage.getItem('token');
@@ -110,64 +135,156 @@ export default function AdminPanel({ isOpen, onClose }) {
         }
     };
 
+    // Conteo total de mensajes sin leer de clientes
+    const totalUnread = useMemo(() => {
+        return ideas.reduce((acc, idea) => {
+            const unread = (idea.messages || []).filter(
+                m => m.senderId !== 'admin-master-id' && m.isRead === false
+            ).length;
+            return acc + unread;
+        }, 0);
+    }, [ideas]);
+
+    // Contadores por estado
+    const counts = useMemo(() => ({
+        todas: ideas.length,
+        en_revision: ideas.filter(i => !i.estado || i.estado === 'en_revision').length,
+        aceptada: ideas.filter(i => i.estado === 'aceptada').length,
+        rechazada: ideas.filter(i => i.estado === 'rechazada').length
+    }), [ideas]);
+
+    // Filtrado instantáneo por buscador + estado
+    const filteredIdeas = useMemo(() => {
+        const term = searchTerm.toLowerCase().trim();
+        return ideas.filter(idea => {
+            const normalizedStatus = idea.estado || 'en_revision';
+            const matchesStatus = statusFilter === 'todas' || normalizedStatus === statusFilter;
+            const matchesSearch =
+                !term ||
+                idea.titulo?.toLowerCase().includes(term) ||
+                idea.servicio?.toLowerCase().includes(term) ||
+                idea.user?.empresa?.toLowerCase().includes(term) ||
+                idea.user?.nombre?.toLowerCase().includes(term);
+            return matchesStatus && matchesSearch;
+        });
+    }, [ideas, searchTerm, statusFilter]);
+
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-[#111827] text-slate-50 p-6 rounded-3xl border border-slate-800 max-w-5xl w-full h-[85vh] flex flex-col shadow-[0_0_50px_rgba(6,182,212,0.15)] relative">
-                <header className="flex justify-between items-center pb-4 border-b border-slate-800">
-                    <h3 className="text-xl font-bold flex items-center gap-2 text-cyan-400">
-                        <ShieldAlert className="w-6 h-6" /> Panel de Administración - NovaCreativa
-                    </h3>
+            <div className="bg-[#111827] text-slate-50 p-6 rounded-3xl border border-slate-800 max-w-5xl w-full h-[88vh] flex flex-col shadow-[0_0_50px_rgba(6,182,212,0.15)] relative">
+                <header className="flex flex-wrap justify-between items-center gap-3 pb-4 border-b border-slate-800">
+                    <div className="flex items-center gap-3">
+                        <h3 className="text-xl font-bold flex items-center gap-2 text-cyan-400">
+                            <ShieldAlert className="w-6 h-6" /> Panel de Administración - NovaCreativa
+                        </h3>
+                        {totalUnread > 0 && (
+                            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-cyan-500 text-slate-950 animate-pulse">
+                                {totalUnread} {totalUnread === 1 ? 'mensaje nuevo' : 'mensajes nuevos'}
+                            </span>
+                        )}
+                    </div>
                     <button onClick={onClose} className="text-slate-400 hover:text-slate-50 cursor-pointer">
                         <X className="w-6 h-6" />
                     </button>
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1 overflow-hidden mt-4">
-                    {/* Columna 1: Lista de Ideas */}
-                    <div className="md:col-span-1 space-y-3 overflow-y-auto pr-2 border-r border-slate-800">
-                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            Ideas Recibidas ({ideas.length})
-                        </h4>
-                        {ideas.map(idea => (
-                            <div
-                                key={idea.id}
-                                onClick={() => { setSelectedIdea(idea); fetchMessages(idea.id); }}
-                                className={`p-3.5 rounded-xl border cursor-pointer transition-all ${selectedIdea?.id === idea.id
-                                    ? 'bg-cyan-950/40 border-cyan-500/60 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
-                                    : 'bg-[#090D16] border-slate-800 hover:border-cyan-500/40'
-                                    }`}
-                            >
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Building2 className="w-3.5 h-3.5 text-cyan-400" />
-                                    <span className="text-xs text-cyan-300 font-semibold">
-                                        {idea.user?.empresa || 'Empresa'}
-                                    </span>
-                                </div>
-                                <h5 className="font-bold text-slate-50 text-sm line-clamp-1">{idea.titulo}</h5>
-                                <p className="text-xs text-slate-400 mt-1">{idea.servicio}</p>
-                                <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-800/80">
-                                    <span
-                                        className={`text-[10px] px-2 py-0.5 rounded font-semibold ${idea.estado === 'aceptada'
-                                            ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/30'
-                                            : idea.estado === 'rechazada'
-                                                ? 'bg-red-950/60 text-red-300 border border-red-500/30'
-                                                : 'bg-amber-950/60 text-amber-300 border border-amber-500/30'
-                                            }`}
-                                    >
-                                        {idea.estado || 'en_revision'}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
+                    {/* Columna 1: Buscador, Filtros y Lista de Ideas */}
+                    <div className="md:col-span-1 flex flex-col overflow-hidden pr-2 border-r border-slate-800">
+                        {/* Buscador */}
+                        <div className="relative mb-2.5">
+                            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                            <input
+                                type="text"
+                                placeholder="Buscar empresa o proyecto..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full bg-[#090D16] border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-50 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500"
+                            />
+                        </div>
+
+                        {/* Pestañas de filtro con contadores */}
+                        <div className="grid grid-cols-2 gap-1.5 mb-3">
+                            {[
+                                { id: 'todas', label: `Todas (${counts.todas})` },
+                                { id: 'en_revision', label: `Revisión (${counts.en_revision})` },
+                                { id: 'aceptada', label: `Aceptadas (${counts.aceptada})` },
+                                { id: 'rechazada', label: `Rechazadas (${counts.rechazada})` }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setStatusFilter(tab.id)}
+                                    className={`px-2 py-1.5 rounded-lg text-[11px] font-semibold transition cursor-pointer ${statusFilter === tab.id
+                                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50'
+                                        : 'bg-[#090D16] text-slate-400 border border-slate-800 hover:text-slate-200'
+                                        }`}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Lista filtrada */}
+                        <div className="space-y-2.5 overflow-y-auto flex-1 pr-1">
+                            {filteredIdeas.length === 0 ? (
+                                <p className="text-xs text-slate-500 text-center py-6 italic">
+                                    No hay ideas que coincidan con el filtro.
+                                </p>
+                            ) : (
+                                filteredIdeas.map(idea => {
+                                    const unreadCount = (idea.messages || []).filter(
+                                        m => m.senderId !== 'admin-master-id' && m.isRead === false
+                                    ).length;
+
+                                    return (
+                                        <div
+                                            key={idea.id}
+                                            onClick={() => { setSelectedIdea(idea); fetchMessages(idea.id); }}
+                                            className={`p-3.5 rounded-xl border cursor-pointer transition-all relative ${selectedIdea?.id === idea.id
+                                                ? 'bg-cyan-950/40 border-cyan-500/60 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
+                                                : 'bg-[#090D16] border-slate-800 hover:border-cyan-500/40'
+                                                }`}
+                                        >
+                                            <div className="flex items-center justify-between gap-2 mb-1">
+                                                <div className="flex items-center gap-1.5 min-w-0">
+                                                    <Building2 className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                                                    <span className="text-xs text-cyan-300 font-semibold truncate">
+                                                        {idea.user?.empresa || 'Empresa'}
+                                                    </span>
+                                                </div>
+                                                {unreadCount > 0 && (
+                                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-cyan-500 text-slate-950 shrink-0">
+                                                        {unreadCount} nuevo{unreadCount > 1 ? 's' : ''}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <h5 className="font-bold text-slate-50 text-sm line-clamp-1">{idea.titulo}</h5>
+                                            <p className="text-xs text-slate-400 mt-1">{idea.servicio}</p>
+                                            <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-800/80">
+                                                <span
+                                                    className={`text-[10px] px-2 py-0.5 rounded font-semibold ${idea.estado === 'aceptada'
+                                                        ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/30'
+                                                        : idea.estado === 'rechazada'
+                                                            ? 'bg-red-950/60 text-red-300 border border-red-500/30'
+                                                            : 'bg-amber-950/60 text-amber-300 border border-amber-500/30'
+                                                        }`}
+                                                >
+                                                    {idea.estado || 'en_revision'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
                     </div>
 
                     {/* Columna 2 y 3: Detalles, Chat y Acciones */}
                     <div className="md:col-span-2 bg-[#090D16] rounded-2xl border border-slate-800 p-4 flex flex-col justify-between overflow-hidden">
                         {selectedIdea ? (
                             <>
-                                {/* Cabecera y ficha de detalles de la idea seleccionada */}
                                 <div className="pb-3 border-b border-slate-800 space-y-2.5">
                                     <div className="flex flex-wrap items-start justify-between gap-2">
                                         <div>
@@ -205,7 +322,6 @@ export default function AdminPanel({ isOpen, onClose }) {
                                         </div>
                                     </div>
 
-                                    {/* Detalles escritos por el cliente */}
                                     {selectedIdea.detalles && (
                                         <div className="p-2.5 rounded-xl bg-[#111827] border border-slate-800/90 text-xs text-slate-300">
                                             <span className="font-semibold text-cyan-400 inline-flex items-center gap-1 mb-1">
@@ -216,7 +332,6 @@ export default function AdminPanel({ isOpen, onClose }) {
                                     )}
                                 </div>
 
-                                {/* Historial de Mensajes tipo Chat */}
                                 <div className="flex-1 overflow-y-auto py-4 space-y-3 px-2">
                                     {messages.length === 0 ? (
                                         <div className="text-center text-slate-500 my-auto pt-16">
@@ -244,7 +359,6 @@ export default function AdminPanel({ isOpen, onClose }) {
                                     )}
                                 </div>
 
-                                {/* Input de Enviar Mensaje */}
                                 <form onSubmit={handleSendMessage} className="flex gap-2 pt-3 border-t border-slate-800">
                                     <input
                                         type="text"

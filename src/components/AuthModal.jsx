@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { X, Send, Lock, Mail, Building, User, AlertCircle, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Send, Lock, Mail, Building, User, AlertCircle, Loader2, Server } from 'lucide-react';
 import { registerCompany, loginCompany } from '../services/api';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isSlowWakeUp, setIsSlowWakeUp] = useState(false);
   const [error, setError] = useState('');
 
   const [formData, setFormData] = useState({
@@ -13,6 +14,18 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     empresa: '',
     password: ''
   });
+
+  useEffect(() => {
+    if (!loading) {
+      setIsSlowWakeUp(false);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setIsSlowWakeUp(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   if (!isOpen) return null;
 
@@ -32,7 +45,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         });
       }
 
-      // Guardar sesión y Token JWT real en el navegador
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
@@ -52,13 +64,11 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     "w-full bg-[#090D16] border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-slate-50 placeholder:text-slate-500 transition-all autofill:shadow-[inset_0_0_0px_1000px_#090D16] autofill:[-webkit-text-fill-color:#F8FAFC]";
 
   return (
-    /* CONTENEDOR EXTERNO: Centrado perfecto con flexbox y fondo oscuro */
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
       <dialog
         open
         className="relative m-0 bg-[#111827] text-slate-50 p-6 sm:p-8 rounded-3xl border border-slate-800 max-w-lg w-full shadow-[0_0_50px_rgba(6,182,212,0.15)] backdrop-blur-2xl block"
       >
-        {/* CABECERA DEL MODAL CON ISOTIPO OFICIAL */}
         <header className="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
           <h3 className="text-xl sm:text-2xl font-bold flex items-center gap-2.5">
             <img
@@ -77,7 +87,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           </button>
         </header>
 
-        {/* PESTAÑAS DE NAVEGACIÓN */}
         <nav className="flex gap-2 p-1.5 bg-[#090D16] rounded-xl border border-slate-800 mb-6">
           <button
             type="button"
@@ -101,7 +110,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           </button>
         </nav>
 
-        {/* MENSAJE DE ERROR SI FALLA EL LOGIN/REGISTRO */}
         {error && (
           <aside className="mb-4 p-3 rounded-xl bg-red-950/80 border border-red-500/50 flex items-center gap-2 text-red-300 text-xs">
             <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
@@ -109,7 +117,6 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
           </aside>
         )}
 
-        {/* FORMULARIO */}
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           {isRegister && (
             <>
@@ -171,7 +178,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
             />
           </label>
 
-          <footer className="pt-4">
+          <footer className="pt-4 space-y-2.5">
             <button
               type="submit"
               disabled={loading}
@@ -180,7 +187,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-white" />
-                  <span>Procesando...</span>
+                  <span>{isSlowWakeUp ? 'Despertando servidor...' : 'Procesando...'}</span>
                 </>
               ) : (
                 <>
@@ -189,6 +196,13 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 </>
               )}
             </button>
+
+            {isSlowWakeUp && (
+              <p className="text-[11px] text-cyan-300/90 bg-cyan-950/40 border border-cyan-500/30 rounded-xl px-3 py-2 flex items-center gap-2">
+                <Server className="w-4 h-4 shrink-0 text-cyan-400 animate-pulse" />
+                <span>Iniciando servidor seguro en la nube. La primera conexión puede tomar hasta 45 segundos...</span>
+              </p>
+            )}
           </footer>
         </form>
       </dialog>
