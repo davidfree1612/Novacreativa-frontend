@@ -43,6 +43,7 @@ export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const [userIdeas, setUserIdeas] = useState([]);
   const [loadingIdeas, setLoadingIdeas] = useState(false);
@@ -191,15 +192,63 @@ export default function App() {
   ];
 
   const projects = [
-    { id: 1, title: "AUTOPARTES ALBUQUERQUE", category: "Branding", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600" },
-    { id: 2, title: "MULTEC", category: "Web", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600" },
-    { id: 3, title: "SEGMECO", category: "3D & Motion", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600" },
-    { id: 4, title: "FRANCINNY", category: "Web", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600" },
+    {
+      id: 1,
+      title: "AUTOPARTES ALBUQUERQUE",
+      category: "Branding",
+      image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600",
+      resumen: "Información del proyecto pendiente de confirmación por dirección."
+    },
+    {
+      id: 2,
+      title: "MULTEC",
+      category: "Web",
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600",
+      resumen: "Información del proyecto pendiente de confirmación por dirección."
+    },
+    {
+      id: 3,
+      title: "SEGMECO",
+      category: "3D & Motion",
+      image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600",
+      resumen: "Información del proyecto pendiente de confirmación por dirección."
+    },
+    {
+      id: 4,
+      title: "FRANCINNY",
+      category: "Web",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600",
+      resumen: "Información del proyecto pendiente de confirmación por dirección."
+    },
   ];
 
   const filteredProjects = activeFilter === 'Todos'
     ? projects
     : projects.filter(p => p.category === activeFilter);
+
+  const handleSelectLogoFromMarquee = (logo) => {
+    const matchedProject = projects.find(
+      p => p.title.toUpperCase() === (logo.projectTitle || logo.nombre).toUpperCase()
+    );
+
+    const scrollToTarget = () => {
+      if (matchedProject) {
+        const cardEl = document.getElementById(`proyecto-${matchedProject.id}`);
+        if (cardEl) {
+          cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+      }
+      document.getElementById('portafolio')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    if (matchedProject && activeFilter !== 'Todos' && activeFilter !== matchedProject.category) {
+      setActiveFilter('Todos');
+      setTimeout(scrollToTarget, 60);
+    } else {
+      scrollToTarget();
+    }
+  };
 
   const openPortalEmpresa = () => {
     setIsAuthOpen(true);
@@ -504,7 +553,7 @@ export default function App() {
         </section>
 
         {/* CARRUSEL DE LOGOS DE CLIENTES */}
-        <LogosMarquee />
+        <LogosMarquee onSelectLogo={handleSelectLogoFromMarquee} />
 
         {/* SERVICIOS */}
         <section id="servicios" className="py-24 bg-[#111827]/40 border-b border-slate-800/80">
@@ -619,7 +668,12 @@ export default function App() {
 
           <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {filteredProjects.map(proj => (
-              <article key={proj.id} className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-[#111827] hover:border-cyan-500/50 transition-all">
+              <article
+                key={proj.id}
+                id={`proyecto-${proj.id}`}
+                onClick={() => setSelectedProject(proj)}
+                className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-[#111827] hover:border-cyan-500/50 transition-all cursor-pointer"
+              >
                 <figure className="aspect-video overflow-hidden">
                   <img src={proj.image} alt={proj.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 </figure>
@@ -640,6 +694,63 @@ export default function App() {
           <p>© 2026 NovaCreativa. Todos los derechos reservados.</p>
         </section>
       </footer>
+
+      {/* VENTANA FLOTANTE SUPERPUESTA DE DETALLE DEL PROYECTO */}
+      {selectedProject && (
+        <div
+          onClick={() => setSelectedProject(null)}
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-4xl rounded-2xl bg-[#111827] border border-cyan-500/40 shadow-[0_0_50px_rgba(6,182,212,0.2)] overflow-hidden grid grid-cols-1 md:grid-cols-12"
+          >
+            <button
+              type="button"
+              onClick={() => setSelectedProject(null)}
+              aria-label="Cerrar ventana"
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-[#090D16]/90 border border-slate-700 text-slate-300 hover:text-cyan-400 hover:border-cyan-400/50 transition cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="md:col-span-7 bg-[#090D16] flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-800">
+              <img
+                src={selectedProject.image}
+                alt={selectedProject.title}
+                className="w-full h-64 md:h-full max-h-[420px] object-cover"
+              />
+            </div>
+
+            <div className="md:col-span-5 p-6 sm:p-7 flex flex-col justify-between gap-6">
+              <div>
+                <span className="inline-block text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">
+                  {selectedProject.category}
+                </span>
+                <h3 className="text-2xl font-black text-slate-50 mb-4">
+                  {selectedProject.title}
+                </h3>
+                <div className="pt-4 border-t border-slate-800">
+                  <p className="text-sm text-slate-400 leading-relaxed">
+                    {selectedProject.resumen}
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
+                <span>NovaCreativa</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedProject(null)}
+                  className="text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL DE HISTORIAL CON BUSCADOR Y NOTIFICACIONES */}
       <dialog
