@@ -3,6 +3,7 @@ const logosClientes = [
     { id: 2, nombre: "Autopartes Albuquerque", src: "/images/albuquerque.png" },
     { id: 3, nombre: "MULTEC", src: "/images/multec.png" },
     { id: 4, nombre: "SEGMECO", src: "/images/segmeco.png" },
+    { id: 5, nombre: "UMAMI", src: "/images/umami.png" },
 ];
 
 const bloqueBase = [...logosClientes, ...logosClientes];
