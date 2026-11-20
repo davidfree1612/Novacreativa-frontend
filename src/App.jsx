@@ -34,7 +34,9 @@ import {
   Lightbulb,
   PenTool,
   Code2,
-  Search
+  Search,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 export default function App() {
@@ -64,6 +66,7 @@ export default function App() {
   const createModalRef = useRef(null);
   const historyModalRef = useRef(null);
   const tituloRef = useRef(null);
+  const carouselRef = useRef(null);
 
   // Despertar Render al cargar la página + restaurar sesión
   useEffect(() => {
@@ -196,35 +199,43 @@ export default function App() {
       id: 1,
       title: "AUTOPARTES ALBUQUERQUE",
       category: "Branding",
-      image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600",
-      resumen: "Información del proyecto pendiente de confirmación por dirección."
+      image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600"
     },
     {
       id: 2,
       title: "MULTEC",
       category: "Web",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600",
-      resumen: "Información del proyecto pendiente de confirmación por dirección."
+      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600"
     },
     {
       id: 3,
       title: "SEGMECO",
       category: "3D & Motion",
-      image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600",
-      resumen: "Información del proyecto pendiente de confirmación por dirección."
+      image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600"
     },
     {
       id: 4,
       title: "FRANCINNY",
       category: "Web",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600",
-      resumen: "Información del proyecto pendiente de confirmación por dirección."
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600"
     },
+    {
+      id: 5,
+      title: "UMAMI",
+      category: "Branding",
+      image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&q=80&w=600"
+    }
   ];
 
   const filteredProjects = activeFilter === 'Todos'
     ? projects
     : projects.filter(p => p.category === activeFilter);
+
+  const scrollCarousel = (direction) => {
+    if (!carouselRef.current) return;
+    const scrollAmount = direction === 'left' ? -420 : 420;
+    carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  };
 
   const handleSelectLogoFromMarquee = (logo) => {
     const matchedProject = projects.find(
@@ -232,14 +243,16 @@ export default function App() {
     );
 
     const scrollToTarget = () => {
-      if (matchedProject) {
-        const cardEl = document.getElementById(`proyecto-${matchedProject.id}`);
-        if (cardEl) {
-          cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
-        }
-      }
       document.getElementById('portafolio')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      if (matchedProject) {
+        setTimeout(() => {
+          const cardEl = document.getElementById(`proyecto-slide-${matchedProject.id}`);
+          if (cardEl) {
+            cardEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+          }
+        }, 250);
+      }
     };
 
     if (matchedProject && activeFilter !== 'Todos' && activeFilter !== matchedProject.category) {
@@ -642,50 +655,85 @@ export default function App() {
           </div>
         </section>
 
-        {/* PORTAFOLIO */}
+        {/* PORTAFOLIO (CARRUSEL HORIZONTAL DESLIZABLE) */}
         <section id="portafolio" className="py-24 max-w-7xl mx-auto px-6">
-          <header className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-            <nav>
-              <h2 className="text-3xl md:text-5xl font-bold mb-4 text-slate-50">Proyectos Destacados</h2>
+          <header className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+            <div>
+              <h2 className="text-3xl md:text-5xl font-bold mb-3 text-slate-50">Proyectos Destacados</h2>
               <p className="text-slate-400">Explora nuestro trabajo.</p>
-            </nav>
+            </div>
 
-            <nav className="flex gap-2 bg-[#111827] p-1.5 rounded-xl border border-slate-800">
-              {['Todos', 'Branding', 'Web', '3D & Motion'].map(cat => (
+            <div className="flex flex-wrap items-center gap-3">
+              <nav className="flex gap-2 bg-[#111827] p-1.5 rounded-xl border border-slate-800">
+                {['Todos', 'Branding', 'Web', '3D & Motion'].map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveFilter(cat)}
+                    className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeFilter === cat
+                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.35)]'
+                      : 'text-slate-400 hover:text-slate-50'
+                      }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </nav>
+
+              <div className="flex items-center gap-2">
                 <button
-                  key={cat}
-                  onClick={() => setActiveFilter(cat)}
-                  className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeFilter === cat
-                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.35)]'
-                    : 'text-slate-400 hover:text-slate-50'
-                    }`}
+                  type="button"
+                  onClick={() => scrollCarousel('left')}
+                  aria-label="Proyecto anterior"
+                  className="p-2.5 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 hover:border-cyan-500/50 hover:text-cyan-400 transition cursor-pointer"
                 >
-                  {cat}
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
-              ))}
-            </nav>
+                <button
+                  type="button"
+                  onClick={() => scrollCarousel('right')}
+                  aria-label="Siguiente proyecto"
+                  className="p-2.5 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 hover:border-cyan-500/50 hover:text-cyan-400 transition cursor-pointer"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
           </header>
 
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div
+            ref={carouselRef}
+            className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
             {filteredProjects.map(proj => (
               <article
                 key={proj.id}
-                id={`proyecto-${proj.id}`}
+                id={`proyecto-slide-${proj.id}`}
                 onClick={() => setSelectedProject(proj)}
-                className="group relative overflow-hidden rounded-2xl border border-slate-800 bg-[#111827] hover:border-cyan-500/50 transition-all cursor-pointer"
+                className="snap-start flex-shrink-0 w-[85%] sm:w-[48%] lg:w-[32%] rounded-2xl border border-slate-800 bg-[#111827] hover:border-cyan-500/50 transition-all overflow-hidden flex flex-col justify-between cursor-pointer group"
               >
-                <figure className="aspect-video overflow-hidden">
-                  <img src={proj.image} alt={proj.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <figure className="aspect-video overflow-hidden bg-[#090D16]">
+                  <img
+                    src={proj.image}
+                    alt={proj.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
                 </figure>
-                <footer className="p-6 flex items-center justify-between border-t border-slate-800 bg-[#111827]">
-                  <nav>
-                    <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider">{proj.category}</span>
-                    <h3 className="text-xl font-bold text-slate-50 mt-1">{proj.title}</h3>
-                  </nav>
+                <footer className="p-5 flex items-center justify-between gap-4 border-t border-slate-800 bg-[#111827]">
+                  <h3 className="text-lg font-bold text-slate-50 truncate">{proj.title}</h3>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedProject(proj);
+                    }}
+                    className="flex-shrink-0 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/20 transition cursor-pointer"
+                  >
+                    Ver detalles
+                  </button>
                 </footer>
               </article>
             ))}
-          </section>
+          </div>
         </section>
       </main>
 
@@ -695,7 +743,7 @@ export default function App() {
         </section>
       </footer>
 
-      {/* VENTANA FLOTANTE SUPERPUESTA DE DETALLE DEL PROYECTO */}
+      {/* VENTANA FLOTANTE SUPERPUESTA DEL PROYECTO */}
       {selectedProject && (
         <div
           onClick={() => setSelectedProject(null)}
@@ -703,7 +751,7 @@ export default function App() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-4xl rounded-2xl bg-[#111827] border border-cyan-500/40 shadow-[0_0_50px_rgba(6,182,212,0.2)] overflow-hidden grid grid-cols-1 md:grid-cols-12"
+            className="relative w-full max-w-3xl rounded-2xl bg-[#111827] border border-cyan-500/40 shadow-[0_0_50px_rgba(6,182,212,0.2)] overflow-hidden"
           >
             <button
               type="button"
@@ -714,39 +762,26 @@ export default function App() {
               <X className="w-5 h-5" />
             </button>
 
-            <div className="md:col-span-7 bg-[#090D16] flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-800">
+            <div className="aspect-video w-full bg-[#090D16] overflow-hidden">
               <img
                 src={selectedProject.image}
                 alt={selectedProject.title}
-                className="w-full h-64 md:h-full max-h-[420px] object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
 
-            <div className="md:col-span-5 p-6 sm:p-7 flex flex-col justify-between gap-6">
-              <div>
-                <span className="inline-block text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">
-                  {selectedProject.category}
-                </span>
-                <h3 className="text-2xl font-black text-slate-50 mb-4">
-                  {selectedProject.title}
-                </h3>
-                <div className="pt-4 border-t border-slate-800">
-                  <p className="text-sm text-slate-400 leading-relaxed">
-                    {selectedProject.resumen}
-                  </p>
-                </div>
-              </div>
+            <div className="p-6 flex items-center justify-between border-t border-slate-800">
+              <h3 className="text-2xl font-black text-slate-50">
+                {selectedProject.title}
+              </h3>
 
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
-                <span>NovaCreativa</span>
-                <button
-                  type="button"
-                  onClick={() => setSelectedProject(null)}
-                  className="text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer"
-                >
-                  Cerrar
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedProject(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition cursor-pointer"
+              >
+                Cerrar
+              </button>
             </div>
           </div>
         </div>
