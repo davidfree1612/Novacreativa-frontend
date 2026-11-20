@@ -252,6 +252,10 @@ export default function App() {
             cardEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
           }
         }, 250);
+
+        setTimeout(() => {
+          setSelectedProject(matchedProject);
+        }, 550);
       }
     };
 
