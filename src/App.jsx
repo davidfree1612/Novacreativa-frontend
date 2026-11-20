@@ -503,6 +503,9 @@ export default function App() {
           </div>
         </section>
 
+        {/* CARRUSEL DE LOGOS DE CLIENTES */}
+        <LogosMarquee />
+
         {/* SERVICIOS */}
         <section id="servicios" className="py-24 bg-[#111827]/40 border-b border-slate-800/80">
           <header className="max-w-7xl mx-auto px-6 text-center mb-16">
@@ -630,9 +633,6 @@ export default function App() {
             ))}
           </section>
         </section>
-
-        {/* CARRUSEL DE LOGOS DE CLIENTES */}
-        <LogosMarquee />
       </main>
 
       <footer className="bg-[#090D16] border-t border-slate-800/80 py-12">
