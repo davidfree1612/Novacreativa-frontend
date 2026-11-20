@@ -4,6 +4,8 @@ const logosClientes = [
     { id: 3, nombre: "MULTEC", projectTitle: "MULTEC", src: "/images/multec.png" },
     { id: 4, nombre: "SEGMECO", projectTitle: "SEGMECO", src: "/images/segmeco.png" },
     { id: 5, nombre: "UMAMI", projectTitle: "UMAMI", src: "/images/umami.png" },
+    { id: 6, nombre: "EL MUNDO MAGICO DE ALESSIA", projectTitle: "EL MUNDO MAGICO DE ALESSIA", src: "/images/alessia.png" },
+    { id: 7, nombre: "SUZUKI MOTOS", projectTitle: "SUZUKI MOTOS", src: "/images/suzuki.png" },
 ];
 
 const bloqueBase = [...logosClientes, ...logosClientes];
