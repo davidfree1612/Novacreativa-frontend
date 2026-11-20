@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import AuthModal from './components/AuthModal';
 import AdminPanel from './components/AdminPanel';
+import LogosMarquee from "./components/LogosMarquee";
+
 import {
   createIdea,
   getMyIdeas,
@@ -628,6 +630,9 @@ export default function App() {
             ))}
           </section>
         </section>
+
+        {/* CARRUSEL DE LOGOS DE CLIENTES */}
+        <LogosMarquee />
       </main>
 
       <footer className="bg-[#090D16] border-t border-slate-800/80 py-12">
