@@ -224,6 +224,18 @@ export default function App() {
       title: "UMAMI",
       category: "Branding",
       image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      id: 6,
+      title: "EL MUNDO MAGICO DE ALESSIA",
+      category: "Branding",
+      image: "/images/alessia.png"
+    },
+    {
+      id: 7,
+      title: "SUZUKI MOTOS",
+      category: "Branding",
+      image: "/images/suzuki.png"
     }
   ];
 
