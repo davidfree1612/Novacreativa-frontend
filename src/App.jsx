@@ -191,10 +191,10 @@ export default function App() {
   ];
 
   const projects = [
-    { id: 1, title: "Neon Cyberpunk Brand", category: "Branding", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600" },
-    { id: 2, title: "Fintech Web App UI", category: "Web", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600" },
-    { id: 3, title: "3D Product Motion", category: "3D & Motion", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600" },
-    { id: 4, title: "E-Commerce Luxury", category: "Web", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600" },
+    { id: 1, title: "AUTOPARTES ALBUQUERQUE", category: "Branding", image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600" },
+    { id: 2, title: "MULTEC", category: "Web", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600" },
+    { id: 3, title: "SEGMECO", category: "3D & Motion", image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600" },
+    { id: 4, title: "FRANCINNY", category: "Web", image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600" },
   ];
 
   const filteredProjects = activeFilter === 'Todos'
