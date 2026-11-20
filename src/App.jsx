@@ -199,43 +199,43 @@ export default function App() {
       id: 1,
       title: "AUTOPARTES ALBUQUERQUE",
       category: "Branding",
-      image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600"
+      image: "/images/banner-albuquerque.jpg"
     },
     {
       id: 2,
       title: "MULTEC",
       category: "Web",
-      image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600"
+      image: "/images/banner-multec.png"
     },
     {
       id: 3,
       title: "SEGMECO",
       category: "3D & Motion",
-      image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=600"
+      image: "/images/banner-segmeco.png"
     },
     {
       id: 4,
       title: "FRANCINNY",
       category: "Web",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600"
+      image: "/images/banner-francinny.png"
     },
     {
       id: 5,
       title: "UMAMI",
       category: "Branding",
-      image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&q=80&w=600"
+      image: "/images/banner-umami.png"
     },
     {
       id: 6,
       title: "EL MUNDO MAGICO DE ALESSIA",
       category: "Branding",
-      image: "/images/alessia.png"
+      image: "/images/banner-alessia.png"
     },
     {
       id: 7,
       title: "SUZUKI MOTOS",
       category: "Branding",
-      image: "/images/suzuki.png"
+      image: "/images/banner-suzuki.png"
     }
   ];
 
