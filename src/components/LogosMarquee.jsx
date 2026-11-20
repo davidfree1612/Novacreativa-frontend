@@ -32,21 +32,21 @@ const logosClientes = [
         nombre: "UMAMI",
         projectTitle: "UMAMI",
         src: "/images/umami.png",
-        imgClass: "scale-110"
+        imgClass: "scale-125"
     },
     {
         id: 6,
         nombre: "EL MUNDO MAGICO DE ALESSIA",
         projectTitle: "EL MUNDO MAGICO DE ALESSIA",
         src: "/images/alessia.png",
-        imgClass: "scale-150"
+        imgClass: "scale-[2.25]"
     },
     {
         id: 7,
         nombre: "SUZUKI MOTOS",
         projectTitle: "SUZUKI MOTOS",
         src: "/images/suzuki.png",
-        imgClass: "scale-75"
+        imgClass: "scale-90"
     }
 ];
 
@@ -67,12 +67,12 @@ export default function LogosMarquee({ onSelectLogo }) {
                             type="button"
                             onClick={() => onSelectLogo?.(logo)}
                             title={`Ver ${logo.nombre}`}
-                            className="flex-shrink-0 w-40 md:w-48 h-14 md:h-16 flex items-center justify-center opacity-70 hover:opacity-100 transition-all duration-300 hover:scale-105 cursor-pointer bg-transparent border-0 p-1 overflow-visible"
+                            className="flex-shrink-0 w-44 md:w-52 h-16 md:h-20 flex items-center justify-center opacity-70 hover:opacity-100 transition-all duration-300 hover:scale-105 cursor-pointer bg-transparent border-0 p-1 overflow-visible"
                         >
                             <img
                                 src={logo.src}
                                 alt={logo.nombre}
-                                className={`max-h-11 md:max-h-12 max-w-full w-auto object-contain transition-transform duration-300 ${logo.imgClass || ""}`}
+                                className={`max-h-12 md:max-h-14 max-w-full w-auto object-contain transition-transform duration-300 ${logo.imgClass || ""}`}
                             />
                         </button>
                     ))}
