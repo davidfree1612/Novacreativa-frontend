@@ -199,43 +199,43 @@ export default function App() {
       id: 1,
       title: "AUTOPARTES ALBUQUERQUE",
       category: "Branding",
-      image: "/images/banner-albuquerque.jpg"
+      image: "/images/albuquerquebaner.jpg"
     },
     {
       id: 2,
       title: "MULTEC",
       category: "Web",
-      image: "/images/banner-multec.png"
+      image: "/images/multecbaner.png"
     },
     {
       id: 3,
       title: "SEGMECO",
       category: "3D & Motion",
-      image: "/images/banner-segmeco.png"
+      image: "/images/segmecobaner.png"
     },
     {
       id: 4,
       title: "FRANCINNY",
       category: "Web",
-      image: "/images/banner-francinny.png"
+      image: "/images/francinnybaner.png"
     },
     {
       id: 5,
       title: "UMAMI",
       category: "Branding",
-      image: "/images/banner-umami.png"
+      image: "/images/umamibaner.png"
     },
     {
       id: 6,
       title: "EL MUNDO MAGICO DE ALESSIA",
       category: "Branding",
-      image: "/images/banner-alessia.png"
+      image: "/images/alessiabaner.png"
     },
     {
       id: 7,
       title: "SUZUKI MOTOS",
       category: "Branding",
-      image: "/images/banner-suzuki.png"
+      image: "/images/suzukibaner.png"
     }
   ];
 
