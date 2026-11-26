@@ -1,3 +1,4 @@
+import React, { useState, useRef } from 'react';
 import { useState, useRef } from 'react';
 import LogosMarquee from './components/LogosMarquee';
 import {
@@ -14,6 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Mail,
+  MessageCircle,
+  Facebook
   MessageCircle
 } from 'lucide-react';
 
