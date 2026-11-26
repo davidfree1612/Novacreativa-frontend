@@ -14,7 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Mail,
-  MessageCircle
+  MessageCircle,
+  Facebook
 } from 'lucide-react';
 
 export default function App() {
@@ -33,6 +34,8 @@ export default function App() {
     encodeURIComponent('Consulta de proyecto - Nova Creativa') +
     '&body=' +
     encodeURIComponent('Hola Nova Creativa, me gustaría recibir información sobre sus servicios.');
+
+  const facebookUrl = 'https://www.facebook.com/share/1BL7ksVmL4/?mibextid=wwXIfr';
 
   const services = [
     {
@@ -481,7 +484,7 @@ export default function App() {
               Cuéntanos qué tienes en mente. En Nova Creativa estamos listos para ayudarte a desarrollar, renovar o fortalecer la imagen y comunicación de tu negocio.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <a
                 href={whatsappUrl}
                 target="_blank"
@@ -498,6 +501,16 @@ export default function App() {
               >
                 <Mail className="w-5 h-5 text-cyan-400" />
                 novacreativanic@outlook.com
+              </a>
+
+              <a
+                href={facebookUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center gap-2.5 bg-[#090D16] hover:bg-slate-900 text-slate-100 px-8 py-4 rounded-full font-bold text-base transition-all border border-cyan-500/40 hover:border-cyan-400"
+              >
+                <Facebook className="w-5 h-5 text-cyan-400" />
+                Nova Creativa en Facebook
               </a>
             </div>
           </div>
