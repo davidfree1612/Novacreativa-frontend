@@ -16,8 +16,8 @@ import {
   ChevronRight,
   Mail,
   MessageCircle,
-  Facebook
-  MessageCircle
+  Facebook,
+  MessageCircle,
 } from 'lucide-react';
 
 function Facebook({ className = 'w-5 h-5', ...props }) {
