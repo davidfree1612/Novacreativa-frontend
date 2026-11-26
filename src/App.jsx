@@ -1,4 +1,3 @@
-import React, { useState, useRef } from 'react';
 import { useState, useRef } from 'react';
 import LogosMarquee from './components/LogosMarquee';
 import {
@@ -15,9 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Mail,
-  MessageCircle,
-  Facebook,
-  MessageCircle,
+  MessageCircle
 } from 'lucide-react';
 
 function Facebook({ className = 'w-5 h-5', ...props }) {
@@ -517,9 +514,9 @@ export default function App() {
 
               <a
                 href={mailtoUrl}
-                className="inline-flex items-center justify-center gap-2.5 bg-[#090D16] hover:bg-slate-900 text-slate-100 px-8 py-4 rounded-full font-bold text-base transition-all border border-cyan-500/40 hover:border-cyan-400"
+                className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-4 rounded-full font-bold text-base transition-all shadow-[0_0_30px_rgba(6,182,212,0.35)] hover:scale-105 active:scale-95"
               >
-                <Mail className="w-5 h-5 text-cyan-400" />
+                <Mail className="w-5 h-5" />
                 novacreativanic@outlook.com
               </a>
 
@@ -527,9 +524,9 @@ export default function App() {
                 href={facebookUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center gap-2.5 bg-[#090D16] hover:bg-slate-900 text-slate-100 px-8 py-4 rounded-full font-bold text-base transition-all border border-cyan-500/40 hover:border-cyan-400"
+                className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-4 rounded-full font-bold text-base transition-all shadow-[0_0_30px_rgba(6,182,212,0.35)] hover:scale-105 active:scale-95"
               >
-                <Facebook className="w-5 h-5 text-cyan-400" />
+                <Facebook className="w-5 h-5" />
                 Nova Creativa en Facebook
               </a>
             </div>
