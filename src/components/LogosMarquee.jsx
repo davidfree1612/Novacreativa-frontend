@@ -4,50 +4,66 @@ const logosClientes = [
         nombre: "Francinny Luxury Nails",
         projectTitle: "FRANCINNY",
         src: "/images/francinny.png",
-        imgClass: "scale-100"
+        imgClass: "scale-180"
     },
     {
         id: 2,
         nombre: "Autopartes Albuquerque",
         projectTitle: "AUTOPARTES ALBUQUERQUE",
         src: "/images/albuquerque.png",
-        imgClass: "scale-105"
+        imgClass: "scale-110"
     },
     {
         id: 3,
         nombre: "MULTEC",
         projectTitle: "MULTEC",
         src: "/images/multec.png",
-        imgClass: "scale-105"
+        imgClass: "scale-100"
     },
     {
         id: 4,
         nombre: "SEGMECO",
         projectTitle: "SEGMECO",
         src: "/images/segmeco.png",
-        imgClass: "scale-105"
+        imgClass: "scale-120"
     },
     {
         id: 5,
         nombre: "UMAMI",
         projectTitle: "UMAMI",
         src: "/images/umami.png",
-        imgClass: "scale-125"
+        imgClass: "scale-200"
     },
     {
         id: 6,
         nombre: "EL MUNDO MAGICO DE ALESSIA",
         projectTitle: "EL MUNDO MAGICO DE ALESSIA",
         src: "/images/alessia.png",
-        imgClass: "scale-[2.25]"
+        imgClass: "scale-370"
     },
     {
         id: 7,
         nombre: "SUZUKI MOTOS",
         projectTitle: "SUZUKI MOTOS",
         src: "/images/suzuki.png",
-        imgClass: "scale-90"
+        imgClass: "scale-130"
+    },
+    {
+        id: 8,
+        nombre: "VARIEDADES EL EDEN",
+        projecTitle: "VARIEDADES EL EDEN",
+        src: "/images/variedadeseden.png",
+        imgClass: "scale-130"
+    },
+    {
+        id: 9,
+        nombre: "SAMMY SALON",
+        projecTittle: "SAMMY SALON",
+        src: "/images/sammysalon.png",
+        imgClass: "scale-180"
     }
+
+
 ];
 
 const bloqueBase = [...logosClientes, ...logosClientes];

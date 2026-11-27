@@ -124,6 +124,7 @@ export default function App() {
       category: 'Branding',
       image: '/images/suzukibaner.png'
     }
+
   ];
 
   const filteredProjects = activeFilter === 'Todos'
