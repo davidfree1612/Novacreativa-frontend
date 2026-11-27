@@ -510,7 +510,7 @@ export default function App() {
                 className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-4 rounded-full font-bold text-base transition-all shadow-[0_0_30px_rgba(6,182,212,0.35)] hover:scale-105 active:scale-95"
               >
                 <MessageCircle className="w-5 h-5" />
-                Hablemos por WhatsApp (+505 8224 1088)
+                Hablemos por WhatsApp
               </a>
 
               <a
