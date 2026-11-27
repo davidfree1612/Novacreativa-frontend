@@ -12,9 +12,7 @@ import {
   PenTool,
   Code2,
   ChevronLeft,
-  ChevronRight,
-  Mail,
-  MessageCircle
+  ChevronRight
 } from 'lucide-react';
 
 const NAV_LINKS = [
@@ -32,11 +30,7 @@ const WHATSAPP_URL =
   'https://wa.me/50582241088?text=' +
   encodeURIComponent('Hola Nova Creativa, me gustaría cotizar un proyecto.');
 
-const MAILTO_URL =
-  'mailto:novacreativanic@outlook.com?subject=' +
-  encodeURIComponent('Consulta de proyecto - Nova Creativa') +
-  '&body=' +
-  encodeURIComponent('Hola Nova Creativa, me gustaría recibir información sobre sus servicios.');
+const MAILTO_URL = 'mailto:novacreativanic@outlook.com';
 
 const FACEBOOK_URL = 'https://www.facebook.com/share/1BL7ksVmL4/?mibextid=wwXIfr';
 
@@ -138,25 +132,6 @@ const PROCESS_STEPS = [
     desc: 'Te acompañamos para llevar tu marca a sus puntos de contacto y comunicar con coherencia.'
   }
 ];
-
-function FacebookIcon({ className = 'w-5 h-5', ...props }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-      {...props}
-    >
-      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-    </svg>
-  );
-}
 
 export default function App() {
   const [activeFilter, setActiveFilter] = useState('Todos');
@@ -422,8 +397,8 @@ export default function App() {
                     type="button"
                     onClick={() => setActiveFilter(cat)}
                     className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeFilter === cat
-                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.35)]'
-                        : 'text-slate-400 hover:text-slate-50'
+                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.35)]'
+                      : 'text-slate-400 hover:text-slate-50'
                       }`}
                   >
                     {cat}
@@ -534,40 +509,173 @@ export default function App() {
         </section>
 
         {/* CONTACTO DIRECTO */}
-        <section id="contacto" className="py-24 max-w-7xl mx-auto px-6">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#111827] via-[#0E1B2E] to-[#111827] border border-cyan-500/35 p-10 md:p-16 text-center shadow-[0_0_45px_rgba(6,182,212,0.14)]">
-            <h2 className="text-3xl md:text-5xl font-black mb-8 text-slate-50">
-              Tu próximo proyecto comienza con una idea.
-            </h2>
-
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-4 rounded-full font-bold text-base transition-all shadow-[0_0_30px_rgba(6,182,212,0.35)] hover:scale-105 active:scale-95"
+        <section id="contacto" className="bg-[#070b12] text-white px-6 py-20 md:py-24">
+          <div className="max-w-[1120px] mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
+            {/* Columna Izquierda: Logo, Texto y Botones Neón */}
+            <div className="max-w-[560px] w-full">
+              <div
+                aria-label="Nova Creativa"
+                className="w-[68px] h-[68px] rounded-2xl bg-[#0e1522] border border-sky-400/20 shadow-[0_0_28px_rgba(0,168,232,0.14)] flex items-center justify-center mb-8"
               >
-                <MessageCircle className="w-5 h-5" />
-                Hablemos por WhatsApp
-              </a>
+                <svg viewBox="0 0 100 100" fill="none" className="w-11 h-11" aria-hidden="true">
+                  <path
+                    d="M16 65C9 44 25 20 53 16C79 12 91 31 85 50C81 62 67 68 53 67C64 63 72 54 73 43C74 29 62 23 47 26C26 30 15 47 16 65Z"
+                    fill="#00A8E8"
+                  />
+                  <path
+                    d="M87 44C93 66 76 87 48 88C24 89 13 71 21 51C26 39 39 32 54 32C66 32 74 40 71 51C68 62 56 69 40 67C51 64 59 58 61 50C63 42 56 38 47 39C33 41 26 53 29 65C33 77 48 80 63 75C76 70 84 58 87 44Z"
+                    fill="#00A8E8"
+                  />
+                  <circle cx="50" cy="51" r="9.5" fill="#00A8E8" />
+                  <path d="M47.5 46.8L54.8 51L47.5 55.2V46.8Z" fill="#FFFFFF" />
+                </svg>
+              </div>
 
-              <a
-                href={MAILTO_URL}
-                className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-4 rounded-full font-bold text-base transition-all shadow-[0_0_30px_rgba(6,182,212,0.35)] hover:scale-105 active:scale-95"
-              >
-                <Mail className="w-5 h-5" />
-                novacreativanic@outlook.com
-              </a>
+              <h2 className="text-3xl md:text-[2.35rem] font-extrabold leading-[1.18] tracking-tight text-white mb-4">
+                Tu próximo proyecto comienza con una idea.
+              </h2>
+              <p className="text-[0.98rem] leading-relaxed text-slate-400 mb-9">
+                Cuéntanos que tienes en mente. En Nova Creativa estamos listos para ayudarte a desarrollar, renovar o fortalecer la imagen y comunicación de tu negocio.
+              </p>
 
-              <a
-                href={FACEBOOK_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white px-8 py-4 rounded-full font-bold text-base transition-all shadow-[0_0_30px_rgba(6,182,212,0.35)] hover:scale-105 active:scale-95"
-              >
-                <FacebookIcon className="w-5 h-5" />
-                Nova Creativa en Facebook
-              </a>
+              <div className="flex flex-col gap-3.5 w-full max-w-[340px]">
+                {/* Botón WhatsApp */}
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2.5 w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-cyan-500 via-sky-600 to-blue-600 text-white text-[0.92rem] font-semibold shadow-[0_0_22px_rgba(6,182,212,0.35),0_0_40px_rgba(0,102,255,0.2)] hover:shadow-[0_0_28px_rgba(6,182,212,0.55),0_0_48px_rgba(0,102,255,0.35)] hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-5 h-5 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
+                    <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1" />
+                  </svg>
+                  <span>WhatsApp</span>
+                </a>
+
+                {/* Botón Correo */}
+                <a
+                  href={MAILTO_URL}
+                  className="inline-flex items-center justify-center gap-2.5 w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-cyan-500 via-sky-600 to-blue-600 text-white text-[0.92rem] font-semibold shadow-[0_0_22px_rgba(6,182,212,0.35),0_0_40px_rgba(0,102,255,0.2)] hover:shadow-[0_0_28px_rgba(6,182,212,0.55),0_0_48px_rgba(0,102,255,0.35)] hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-5 h-5 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <rect width="20" height="16" x="2" y="4" rx="2" />
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                  </svg>
+                  <span>novacreativanic@outlook.com</span>
+                </a>
+
+                {/* Botón Facebook */}
+                <a
+                  href={FACEBOOK_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2.5 w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-cyan-500 via-sky-600 to-blue-600 text-white text-[0.92rem] font-semibold shadow-[0_0_22px_rgba(6,182,212,0.35),0_0_40px_rgba(0,102,255,0.2)] hover:shadow-[0_0_28px_rgba(6,182,212,0.55),0_0_48px_rgba(0,102,255,0.35)] hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-5 h-5 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  </svg>
+                  <span>Nova Creativa en Facebook</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Columna Derecha: Síguenos */}
+            <div className="flex flex-col items-start md:items-center pt-2">
+              <span className="text-[0.95rem] font-bold text-white mb-6 md:mb-8">
+                Síguenos
+              </span>
+              <div className="flex flex-row md:flex-col items-center gap-6 md:gap-8">
+                <a
+                  href={MAILTO_URL}
+                  aria-label="Correo electrónico"
+                  className="text-slate-300 hover:text-sky-400 hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-6 h-6"
+                    aria-hidden="true"
+                  >
+                    <rect width="20" height="16" x="2" y="4" rx="2" />
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                  </svg>
+                </a>
+
+                <a
+                  href={FACEBOOK_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="text-slate-300 hover:text-sky-400 hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-6 h-6"
+                    aria-hidden="true"
+                  >
+                    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                  </svg>
+                </a>
+
+                <a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="WhatsApp"
+                  className="text-slate-300 hover:text-sky-400 hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-6 h-6"
+                    aria-hidden="true"
+                  >
+                    <path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21" />
+                    <path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1" />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
         </section>
